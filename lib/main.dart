@@ -4,16 +4,19 @@ import 'package:flutter/material.dart';
 
 import 'in_app_webiew_example.screen.dart';
 
-// import 'package:permission_handler/permission_handler.dart';
-
-// InAppLocalhostServer localhostServer = new InAppLocalhostServer();
-
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-//  await Permission.camera.request();
-//  await Permission.storage.request();
-  // await localhostServer.start();
   runApp(MyApp());
+}
+
+Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) {
+  if (message.containsKey('data')) {
+    final dynamic data = message['data'];
+  }
+
+  if (message.containsKey('notification')) {
+    final dynamic notification = message['notification'];
+  }
 }
 
 Drawer myDrawer({@required BuildContext context}) {
