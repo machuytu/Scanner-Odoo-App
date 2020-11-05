@@ -1,4 +1,4 @@
-package io.flutter.plugins.firebasemessagingexample;
+package com.example.odooscanner;
 
 import io.flutter.app.FlutterApplication;
 import io.flutter.plugin.common.PluginRegistry;
