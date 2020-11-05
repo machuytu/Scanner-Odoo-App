@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'api/push_notify/res_push_notify.dart';
 import 'in_app_webiew_example.screen.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  var res = RestDataSourcePushNotify();
+  res.retrieveMessage();
   runApp(MyApp());
 }
 
