@@ -47,6 +47,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
     // Bluetooth scanner
     _bluetooth.devices.listen((device) async {
       if (device.address == 'DC:53:60:86:1E:A5') {
+        print('Tim thay1');
         Data data = new Data();
         await data.sendPartnerId(partnerId).then((value1) async {
           if (value1 == true) {
@@ -94,153 +95,174 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: myDrawer(context: context),
-      body: Column(children: <Widget>[
-        Expanded(
-          child: Container(
-            decoration:
-                BoxDecoration(border: Border.all(color: Colors.blueAccent)),
-            child: InAppWebView(
-              initialUrl: Domain.domain,
-              initialHeaders: {},
-              initialOptions: InAppWebViewGroupOptions(
-                  crossPlatform: InAppWebViewOptions(
-                    debuggingEnabled: true,
-                    useShouldOverrideUrlLoading: true,
-                  ),
-                  android: AndroidInAppWebViewOptions()),
-              onWebViewCreated: (InAppWebViewController controller) {
-                webView = controller;
-                print("onWebViewCreated");
-              },
-              onLoadStart: (InAppWebViewController controller, String url) {
-                print("onLoadStart $url");
-                setState(() {
-                  this.url = url;
-                });
-              },
-              shouldOverrideUrlLoading:
-                  (controller, shouldOverrideUrlLoadingRequest) async {
-                var url = shouldOverrideUrlLoadingRequest.url;
-                var uri = Uri.parse(url);
-
-                if (![
-                  "http",
-                  "https",
-                  "file",
-                  "chrome",
-                  "data",
-                  "javascript",
-                  "about"
-                ].contains(uri.scheme)) {
-                  if (await canLaunch(url)) {
-                    // Launch the App
-                    await launch(
-                      url,
-                    );
-                    // and cancel the request
-                    return ShouldOverrideUrlLoadingAction.CANCEL;
-                  }
-                }
-
-                return ShouldOverrideUrlLoadingAction.ALLOW;
-              },
-              onLoadStop:
-                  (InAppWebViewController controller, String url) async {
-                String html1, html2;
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                if (await controller.evaluateJavascript(
-                        source: "window.document.getElementById('login');") !=
-                    null) {
-                  html1 = await controller.evaluateJavascript(
-                      source: "window.document.getElementById('login').value;");
-                  html2 = await controller.evaluateJavascript(
-                      source:
-                          "window.document.getElementById('password').value;");
-                }
-
-                print("onLoadStop $url");
-                if ((html1 != null && html2 != null)) {
-                  if (html1 != "" && html2 != "") {
-                    await prefs.setString('username', html1);
-                    await prefs.setString('password', html2);
-                  }
-                  Data data = new Data();
-                  await data.login(html1, html2).then((value1) async {
-                    if (value1 != null) {
-                      User user = value1;
-                      isTrue = true;
-                      partnerId = user.id.toString();
-                      print("user id: " + user.id.toString());
-                      print("partner id: " + user.partnerId.toString());
-                      await prefs.setString('partnerId', partnerId);
-                    }
+      body: SafeArea(
+        child: Column(children: <Widget>[
+          Expanded(
+            child: Container(
+              decoration:
+                  BoxDecoration(border: Border.all(color: Colors.blueAccent)),
+              child: InAppWebView(
+                initialUrl: Domain.domain,
+                initialHeaders: {},
+                initialOptions: InAppWebViewGroupOptions(
+                    crossPlatform: InAppWebViewOptions(
+                      debuggingEnabled: true,
+                      useShouldOverrideUrlLoading: true,
+                    ),
+                    android:
+                        AndroidInAppWebViewOptions(useHybridComposition: true)),
+                onWebViewCreated: (InAppWebViewController controller) {
+                  webView = controller;
+                  print("onWebViewCreated");
+                },
+                onLoadStart: (InAppWebViewController controller, String url) {
+                  print("onLoadStart $url");
+                  setState(() {
+                    this.url = url;
                   });
-                }
-                if (isTrue == true) {
-                  try {
-                    if (_scanning) {
-                      await _bluetooth.stopScan();
-                      debugPrint("scanning stoped");
-                      setState(() {
-                        _data = '';
-                      });
-                    } else {
-                      await _bluetooth.startScan(pairedDevices: false);
-                      debugPrint("scanning started");
-                      setState(() {
-                        _scanning = true;
-                      });
-                    }
-                  } on PlatformException catch (e) {
-                    debugPrint(e.toString());
-                  }
-                }
+                },
+                shouldOverrideUrlLoading:
+                    (controller, shouldOverrideUrlLoadingRequest) async {
+                  var url = shouldOverrideUrlLoadingRequest.url;
+                  var uri = Uri.parse(url);
 
-                if (url == (Domain.domain + 'shop/payment')) {
-                  if (partnerId != null) {
-                    Data data = new Data();
-                    await data.getOrder(partnerId).then((value1) async {
-                      if (value1 != null) {
-                        SaleOrderId orderId = value1;
-                        print("order id: " + orderId.soId.toString());
-                      }
-                    });
-                  } else if (partnerId == null) {
-                    Data data = new Data();
-                    if (partnerIdshare != null) {
-                      partnerId = partnerIdshare;
-                    } else {
-                      return;
+                  if (![
+                    "http",
+                    "https",
+                    "file",
+                    "chrome",
+                    "data",
+                    "javascript",
+                    "about"
+                  ].contains(uri.scheme)) {
+                    if (await canLaunch(url)) {
+                      // Launch the App
+                      await launch(
+                        url,
+                      );
+                      // and cancel the request
+                      return ShouldOverrideUrlLoadingAction.CANCEL;
                     }
-                    await data.getOrder(partnerId).then((value1) async {
+                  }
+
+                  return ShouldOverrideUrlLoadingAction.ALLOW;
+                },
+                onLoadStop:
+                    (InAppWebViewController controller, String url) async {
+                  String html1, html2;
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  if (await controller.evaluateJavascript(
+                          source: "window.document.getElementById('login');") !=
+                      null) {
+                    html1 = await controller.evaluateJavascript(
+                        source:
+                            "window.document.getElementById('login').value;");
+                    html2 = await controller.evaluateJavascript(
+                        source:
+                            "window.document.getElementById('password').value;");
+                  }
+
+                  print("onLoadStop $url");
+                  if ((html1 != null && html2 != null)) {
+                    if (html1 != "" && html2 != "") {
+                      await prefs.setString('username', html1);
+                      await prefs.setString('password', html2);
+                    }
+                    Data data = new Data();
+                    await data.login(html1, html2).then((value1) async {
                       if (value1 != null) {
-                        SaleOrderId orderId = value1;
-                        print("order id: " + orderId.soId.toString());
+                        User user = value1;
+                        isTrue = true;
+                        partnerId = user.partnerId.toString();
+                        print("user id: " + user.id.toString());
+                        print("partner id: " + user.partnerId.toString());
+                        await prefs.setString('partnerId', partnerId);
                       }
                     });
                   }
-                }
-              },
-              onProgressChanged:
-                  (InAppWebViewController controller, int progress) {
-                setState(() {
-                  this.progress = progress / 100;
-                });
-              },
-              onUpdateVisitedHistory: (InAppWebViewController controller,
-                  String url, bool androidIsReload) {
-                print("onUpdateVisitedHistory $url");
-                setState(() {
-                  this.url = url;
-                });
-              },
-              onConsoleMessage: (controller, consoleMessage) {
-                print(consoleMessage);
-              },
+                  if (isTrue == true) {}
+
+                  if (url == (Domain.domain + 'shop/payment')) {
+                    if (partnerId != null) {
+                      Data data = new Data();
+                      await data.getOrder(partnerId).then((value1) async {
+                        if (value1 != null) {
+                          SaleOrderId orderId = value1;
+                          print("order id: " + orderId.soId.toString());
+                          try {
+                            if (_scanning) {
+                              await _bluetooth.stopScan();
+                              debugPrint("scanning stoped");
+                              setState(() {
+                                _data = '';
+                              });
+                            } else {
+                              await _bluetooth.startScan(pairedDevices: false);
+                              debugPrint("scanning started");
+                              setState(() {
+                                _scanning = true;
+                              });
+                            }
+                          } on PlatformException catch (e) {
+                            debugPrint(e.toString());
+                          }
+                        }
+                      });
+                    } else if (partnerId == null) {
+                      Data data = new Data();
+                      if (partnerIdshare != null) {
+                        partnerId = partnerIdshare;
+                      } else {
+                        return;
+                      }
+                      await data.getOrder(partnerId).then((value1) async {
+                        if (value1 != null) {
+                          SaleOrderId orderId = value1;
+                          print("order id: " + orderId.soId.toString());
+                          try {
+                            if (_scanning) {
+                              await _bluetooth.stopScan();
+                              debugPrint("scanning stoped");
+                              setState(() {
+                                _data = '';
+                              });
+                            } else {
+                              await _bluetooth.startScan(pairedDevices: false);
+                              debugPrint("scanning started");
+                              setState(() {
+                                _scanning = true;
+                              });
+                            }
+                          } on PlatformException catch (e) {
+                            debugPrint(e.toString());
+                          }
+                        }
+                      });
+                    }
+                  }
+                },
+                onProgressChanged:
+                    (InAppWebViewController controller, int progress) {
+                  setState(() {
+                    this.progress = progress / 100;
+                  });
+                },
+                onUpdateVisitedHistory: (InAppWebViewController controller,
+                    String url, bool androidIsReload) {
+                  print("onUpdateVisitedHistory $url");
+                  setState(() {
+                    this.url = url;
+                  });
+                },
+                onConsoleMessage: (controller, consoleMessage) {
+                  print(consoleMessage);
+                },
+              ),
             ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 }

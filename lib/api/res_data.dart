@@ -29,7 +29,6 @@ class Data {
   }
 
   Future<SaleOrderId> getOrder(String partnerId) async {
-    int orderId;
     final http.Response response = await http.get(
       Domain.login + 'sale-order/$partnerId',
       headers: <String, String>{
@@ -47,13 +46,14 @@ class Data {
   }
 
   Future<bool> sendPartnerId(String partnerId) async {
+    int partnerIdInt = int.tryParse(partnerId);
     final http.Response response = await http.post(
-      Domain.login + 'login',
+      Domain.login + 'fcm',
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
-      body: jsonEncode(<String, String>{
-        "partner_id": partnerId,
+      body: jsonEncode(<String, int>{
+        "partner_id": partnerIdInt,
       }),
     );
 

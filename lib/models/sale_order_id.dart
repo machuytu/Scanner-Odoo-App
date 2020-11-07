@@ -1,5 +1,5 @@
 class SaleOrderId {
-  int soId;
+  String soId;
 
   SaleOrderId({this.soId});
 

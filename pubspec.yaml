@@ -37,7 +37,8 @@ dependencies:
   socket_io_client: ^0.9.11
   firebase_messaging: ^7.0.3
   overlay_support: ^1.0.5
-  flutter_inappwebview: ^4.0.0+4
+  flutter_inappwebview:
+    path: ../
   get: ^3.15.0
   shared_preferences: ^0.5.12+4
 
