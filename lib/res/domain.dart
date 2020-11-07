@@ -1,4 +1,4 @@
 class Domain {
-  static String login = "https://4cf387a6a2e7.ngrok.io/";
-  static String domain = "https://4393882b2c44.ap.ngrok.io/";
+  static String login = "https://4614090dcc97.ngrok.io/";
+  static String domain = "http://33a21e761cfb.ap.ngrok.io/";
 }

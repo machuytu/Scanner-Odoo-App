@@ -69,6 +69,7 @@ class RestDataSourcePushNotify {
     _firebaseMessaging.configure(
       // onBackgroundMessage: myBackgroundMessageHandler,
       onMessage: (Map<String, dynamic> message) async {
+        print('onMessage: $message');
         showSimpleNotification(
           Text(
             '${message['notification']['title']}',

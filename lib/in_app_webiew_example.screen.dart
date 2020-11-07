@@ -163,6 +163,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                         User user = value1;
                         isTrue = true;
                         print("user id: " + user.id.toString());
+                        print("user id: " + user.partnerId.toString());
                       }
                     });
                   }

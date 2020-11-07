@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'api/push_notify/res_push_notify.dart';
@@ -7,8 +8,12 @@ import 'in_app_webiew_example.screen.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   var res = RestDataSourcePushNotify();
   res.retrieveMessage();
+  _firebaseMessaging.getToken().then((token) {
+    print('token: $token');
+  });
   runApp(MyApp());
 }
 
