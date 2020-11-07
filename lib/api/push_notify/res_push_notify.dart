@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:odooscanner/models/firebase_messing.dart';
 import 'package:odooscanner/res/string.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -69,7 +71,10 @@ class RestDataSourcePushNotify {
     _firebaseMessaging.configure(
       // onBackgroundMessage: myBackgroundMessageHandler,
       onMessage: (Map<String, dynamic> message) async {
-        print('onMessage: $message');
+        CloudMessing cloudMessaging = new CloudMessing();
+        cloudMessaging.soId = int.tryParse(message['data']['so_id']);
+        cloudMessaging.partnerName = message['data']['partner_name'];
+        cloudMessaging.soName = message['data']['so_name'];
         showSimpleNotification(
           Text(
             '${message['notification']['title']}',
@@ -79,6 +84,7 @@ class RestDataSourcePushNotify {
           slideDismiss: true,
           background: Colors.black,
         );
+        Get.snackbar("${cloudMessaging.partnerName}", "${cloudMessaging.soId}");
       },
       onResume: (Map<String, dynamic> message) async {
         print('on resume $message');
