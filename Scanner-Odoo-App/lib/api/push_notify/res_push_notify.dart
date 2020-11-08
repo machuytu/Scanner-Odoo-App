@@ -98,6 +98,7 @@ class RestDataSourcePushNotify {
           slideDismiss: true,
           background: Colors.black.withOpacity(0.3),
         );
+        
       },
       onLaunch: (Map<String, dynamic> message) async {
         print('on launch $message');
