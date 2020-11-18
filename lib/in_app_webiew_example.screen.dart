@@ -1,16 +1,20 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_scan_bluetooth/flutter_scan_bluetooth.dart';
 import 'package:odooscanner/res/domain.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:odooscanner/models/gobal.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'api/res_data.dart';
 import 'main.dart';
+import 'package:html/parser.dart';
+import 'package:http/http.dart' as http;
 
+import 'models/sale_order_id.dart';
 import 'models/user.dart';
 
 class InAppWebViewExampleScreen extends StatefulWidget {
@@ -20,24 +24,19 @@ class InAppWebViewExampleScreen extends StatefulWidget {
 }
 
 class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
-  Glob glob = new Glob();
-  InAppWebViewController webview;
+  InAppWebViewController webView;
   ContextMenu contextMenu;
   String url = "";
   double progress = 0;
   bool _scanning = false;
-  bool _scanningBluetooth = false;
   FlutterScanBluetooth _bluetooth = FlutterScanBluetooth();
   String username, password, partnerIdshare;
-  final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
 
   String _data;
 
   bool isTrue = false;
 
   String partnerId;
-
-  var html3;
 
   @override
   void initState() {
@@ -47,24 +46,16 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
     // Bluetooth scanner
     _bluetooth.devices.listen((device) async {
-<<<<<<< HEAD:Scanner-Odoo-App/lib/in_app_webiew_example.screen.dart
-      if (device.address == '4C:1D:96:B9:59:19') {
-=======
       if (device.address == 'DC:53:60:86:1E:A5') {
->>>>>>> main:lib/in_app_webiew_example.screen.dart
         print('Tim thay1');
         Data data = new Data();
-        if (_scanningBluetooth == false) {
-          await data.sendPartnerId(partnerId).then((value1) async {
-            if (value1 == true) {
-              print('gui thanh cong');
-              _scanningBluetooth = true;
-            } else {
-              print('gui that bai');
-            }
-          });
-        }
-
+        await data.sendPartnerId(partnerId).then((value1) async {
+          if (value1 == true) {
+            print('gui thanh cong');
+          } else {
+            print('gui that bai');
+          }
+        });
         setState(() {
           print('Tim thay');
           _bluetooth.stopScan();
@@ -121,18 +112,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     android:
                         AndroidInAppWebViewOptions(useHybridComposition: true)),
                 onWebViewCreated: (InAppWebViewController controller) {
-<<<<<<< HEAD:Scanner-Odoo-App/lib/in_app_webiew_example.screen.dart
-                  glob.account = controller;
-                  print("onWebViewCreated");
-                },
-                onLoadStart:
-                    (InAppWebViewController controller, String url) async {
-=======
                   webView = controller;
                   print("onWebViewCreated");
                 },
                 onLoadStart: (InAppWebViewController controller, String url) {
->>>>>>> main:lib/in_app_webiew_example.screen.dart
                   print("onLoadStart $url");
                   setState(() {
                     this.url = url;
@@ -180,36 +163,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                             "window.document.getElementById('password').value;");
                   }
 
-<<<<<<< HEAD:Scanner-Odoo-App/lib/in_app_webiew_example.screen.dart
-                  if (await controller.evaluateJavascript(
-                          source: "window.phantomVar") !=
-                      null) {
-                    await prefs.setString('username', null);
-                    await prefs.setString('password', null);
-                    await prefs.setString('partnerId', null);
-                    _firebaseMessaging.unsubscribeFromTopic('admin');
-                  }
-
-                  if (await controller.evaluateJavascript(
-                          source: "window.phantomVar") !=
-                      null) {
-                    await prefs.setString('username', null);
-                    await prefs.setString('password', null);
-                    await prefs.setString('partnerId', null);
-                    _firebaseMessaging.unsubscribeFromTopic('admin');
-                  }
-
-                  if (url == (Domain.domain + 'web/login') ||
-                      url == (Domain.domain + 'vi/web/login') ||
-                      url == (Domain.domain + 'en/web/login')) {
-                    await prefs.setString('username', null);
-                    await prefs.setString('password', null);
-                    await prefs.setString('partnerId', null);
-                    _firebaseMessaging.unsubscribeFromTopic('admin');
-                  }
-
-=======
->>>>>>> main:lib/in_app_webiew_example.screen.dart
                   print("onLoadStop $url");
                   if ((html1 != null && html2 != null)) {
                     if (html1 != "" && html2 != "") {
@@ -220,83 +173,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     await data.login(html1, html2).then((value1) async {
                       if (value1 != null) {
                         User user = value1;
-<<<<<<< HEAD:Scanner-Odoo-App/lib/in_app_webiew_example.screen.dart
-                        if (user.id == 2) {
-                          _firebaseMessaging.subscribeToTopic('admin');
-                        }
-                        partnerId = user.partnerId.toString();
-                        await prefs.setString('partnerId', partnerId);
-                        print('partnerId: ' + partnerId);
-                      }
-                    });
-                  }
-
-                  if (url == (Domain.domain + 'shop/payment') ||
-                      url == (Domain.domain + 'vi/shop/payment') ||
-                      url == (Domain.domain + 'en/shop/payment')) {
-                    if (partnerId != null) {
-                      Data data = new Data();
-                      if (_scanningBluetooth == false) {
-                        try {
-                          if (_scanning) {
-                            await _bluetooth.stopScan();
-                            debugPrint("scanning stoped");
-                            setState(() {
-                              _data = '';
-                            });
-                          } else {
-                            await _bluetooth.startScan(pairedDevices: false);
-                            debugPrint("scanning started");
-                            setState(() {
-                              _scanning = true;
-                            });
-                          }
-                        } on PlatformException catch (e) {
-                          debugPrint(e.toString());
-                        }
-                      }
-
-                      // await data.getOrder(partnerId).then((value1) async {
-                      //   if (value1 != null) {
-                      //     SaleOrderId orderId = value1;
-                      //     print("order id: " + orderId.soId.toString());
-                      //   }
-                      // });
-                    } else if (partnerId == null) {
-                      Data data = new Data();
-                      if (partnerIdshare != null) {
-                        partnerId = partnerIdshare;
-                      } else {
-                        return;
-                      }
-                      if (_scanningBluetooth == false) {
-                        try {
-                          if (_scanning) {
-                            await _bluetooth.stopScan();
-                            debugPrint("scanning stoped");
-                            setState(() {
-                              _data = '';
-                            });
-                          } else {
-                            await _bluetooth.startScan(pairedDevices: false);
-                            debugPrint("scanning started");
-                            setState(() {
-                              _scanning = true;
-                            });
-                          }
-                        } on PlatformException catch (e) {
-                          debugPrint(e.toString());
-                        }
-                      }
-
-                      // await data.getOrder(partnerId).then((value1) async {
-                      //   if (value1 != null) {
-                      //     SaleOrderId orderId = value1;
-                      //     print("order id: " + orderId.soId.toString());
-
-                      //   }
-                      // });
-=======
                         isTrue = true;
                         partnerId = user.partnerId.toString();
                         print("user id: " + user.id.toString());
@@ -363,7 +239,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                           }
                         }
                       });
->>>>>>> main:lib/in_app_webiew_example.screen.dart
                     }
                   }
                 },
