@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "42824672200",
+    "firebase_url": "https://node-odoo.firebaseio.com",
+    "project_id": "node-odoo",
+    "storage_bucket": "node-odoo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:42824672200:android:fa1fb66d9c552eeab016fd",
+        "android_client_info": {
+          "package_name": "com.example.odooscanner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "42824672200-v0to5keje6v8e0to4itf8o5m42r9klhn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZcpCnO-omGQQdoCKsZGcWGbgZ-eVzyuo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "42824672200-v0to5keje6v8e0to4itf8o5m42r9klhn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
