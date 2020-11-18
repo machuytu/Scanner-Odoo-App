@@ -47,11 +47,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
     // Bluetooth scanner
     _bluetooth.devices.listen((device) async {
-<<<<<<< HEAD:Scanner-Odoo-App/lib/in_app_webiew_example.screen.dart
       if (device.address == '4C:1D:96:B9:59:19') {
-=======
-      if (device.address == 'DC:53:60:86:1E:A5') {
->>>>>>> main:lib/in_app_webiew_example.screen.dart
         print('Tim thay1');
         Data data = new Data();
         if (_scanningBluetooth == false) {
@@ -121,18 +117,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     android:
                         AndroidInAppWebViewOptions(useHybridComposition: true)),
                 onWebViewCreated: (InAppWebViewController controller) {
-<<<<<<< HEAD:Scanner-Odoo-App/lib/in_app_webiew_example.screen.dart
                   glob.account = controller;
                   print("onWebViewCreated");
                 },
                 onLoadStart:
                     (InAppWebViewController controller, String url) async {
-=======
-                  webView = controller;
-                  print("onWebViewCreated");
-                },
-                onLoadStart: (InAppWebViewController controller, String url) {
->>>>>>> main:lib/in_app_webiew_example.screen.dart
                   print("onLoadStart $url");
                   setState(() {
                     this.url = url;
@@ -180,7 +169,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                             "window.document.getElementById('password').value;");
                   }
 
-<<<<<<< HEAD:Scanner-Odoo-App/lib/in_app_webiew_example.screen.dart
                   if (await controller.evaluateJavascript(
                           source: "window.phantomVar") !=
                       null) {
@@ -208,8 +196,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     _firebaseMessaging.unsubscribeFromTopic('admin');
                   }
 
-=======
->>>>>>> main:lib/in_app_webiew_example.screen.dart
                   print("onLoadStop $url");
                   if ((html1 != null && html2 != null)) {
                     if (html1 != "" && html2 != "") {
@@ -220,7 +206,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     await data.login(html1, html2).then((value1) async {
                       if (value1 != null) {
                         User user = value1;
-<<<<<<< HEAD:Scanner-Odoo-App/lib/in_app_webiew_example.screen.dart
                         if (user.id == 2) {
                           _firebaseMessaging.subscribeToTopic('admin');
                         }
@@ -296,74 +281,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
                       //   }
                       // });
-=======
-                        isTrue = true;
-                        partnerId = user.partnerId.toString();
-                        print("user id: " + user.id.toString());
-                        print("partner id: " + user.partnerId.toString());
-                        await prefs.setString('partnerId', partnerId);
-                      }
-                    });
-                  }
-                  if (isTrue == true) {}
-
-                  if (url == (Domain.domain + 'shop/payment')) {
-                    if (partnerId != null) {
-                      Data data = new Data();
-                      await data.getOrder(partnerId).then((value1) async {
-                        if (value1 != null) {
-                          SaleOrderId orderId = value1;
-                          print("order id: " + orderId.soId.toString());
-                          try {
-                            if (_scanning) {
-                              await _bluetooth.stopScan();
-                              debugPrint("scanning stoped");
-                              setState(() {
-                                _data = '';
-                              });
-                            } else {
-                              await _bluetooth.startScan(pairedDevices: false);
-                              debugPrint("scanning started");
-                              setState(() {
-                                _scanning = true;
-                              });
-                            }
-                          } on PlatformException catch (e) {
-                            debugPrint(e.toString());
-                          }
-                        }
-                      });
-                    } else if (partnerId == null) {
-                      Data data = new Data();
-                      if (partnerIdshare != null) {
-                        partnerId = partnerIdshare;
-                      } else {
-                        return;
-                      }
-                      await data.getOrder(partnerId).then((value1) async {
-                        if (value1 != null) {
-                          SaleOrderId orderId = value1;
-                          print("order id: " + orderId.soId.toString());
-                          try {
-                            if (_scanning) {
-                              await _bluetooth.stopScan();
-                              debugPrint("scanning stoped");
-                              setState(() {
-                                _data = '';
-                              });
-                            } else {
-                              await _bluetooth.startScan(pairedDevices: false);
-                              debugPrint("scanning started");
-                              setState(() {
-                                _scanning = true;
-                              });
-                            }
-                          } on PlatformException catch (e) {
-                            debugPrint(e.toString());
-                          }
-                        }
-                      });
->>>>>>> main:lib/in_app_webiew_example.screen.dart
                     }
                   }
                 },
