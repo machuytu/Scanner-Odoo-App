@@ -1,20 +1,16 @@
-import 'dart:developer';
-import 'dart:io';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_scan_bluetooth/flutter_scan_bluetooth.dart';
 import 'package:odooscanner/res/domain.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:odooscanner/models/gobal.dart';
 
 import 'api/res_data.dart';
 import 'main.dart';
-import 'package:html/parser.dart';
-import 'package:http/http.dart' as http;
 
-import 'models/sale_order_id.dart';
 import 'models/user.dart';
 
 class InAppWebViewExampleScreen extends StatefulWidget {
@@ -24,19 +20,24 @@ class InAppWebViewExampleScreen extends StatefulWidget {
 }
 
 class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
-  InAppWebViewController webView;
+  Glob glob = new Glob();
+  InAppWebViewController webview;
   ContextMenu contextMenu;
   String url = "";
   double progress = 0;
   bool _scanning = false;
+  bool _scanningBluetooth = false;
   FlutterScanBluetooth _bluetooth = FlutterScanBluetooth();
   String username, password, partnerIdshare;
+  final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
 
   String _data;
 
   bool isTrue = false;
 
   String partnerId;
+
+  var html3;
 
   @override
   void initState() {
@@ -46,16 +47,20 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
     // Bluetooth scanner
     _bluetooth.devices.listen((device) async {
-      if (device.address == 'DC:53:60:86:1E:A5') {
+      if (device.address == '4C:1D:96:B9:59:19') {
         print('Tim thay1');
         Data data = new Data();
-        await data.sendPartnerId(partnerId).then((value1) async {
-          if (value1 == true) {
-            print('gui thanh cong');
-          } else {
-            print('gui that bai');
-          }
-        });
+        if (_scanningBluetooth == false) {
+          await data.sendPartnerId(partnerId).then((value1) async {
+            if (value1 == true) {
+              print('gui thanh cong');
+              _scanningBluetooth = true;
+            } else {
+              print('gui that bai');
+            }
+          });
+        }
+
         setState(() {
           print('Tim thay');
           _bluetooth.stopScan();
@@ -112,10 +117,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     android:
                         AndroidInAppWebViewOptions(useHybridComposition: true)),
                 onWebViewCreated: (InAppWebViewController controller) {
-                  webView = controller;
+                  glob.account = controller;
                   print("onWebViewCreated");
                 },
-                onLoadStart: (InAppWebViewController controller, String url) {
+                onLoadStart:
+                    (InAppWebViewController controller, String url) async {
                   print("onLoadStart $url");
                   setState(() {
                     this.url = url;
@@ -163,6 +169,33 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                             "window.document.getElementById('password').value;");
                   }
 
+                  if (await controller.evaluateJavascript(
+                          source: "window.phantomVar") !=
+                      null) {
+                    await prefs.setString('username', null);
+                    await prefs.setString('password', null);
+                    await prefs.setString('partnerId', null);
+                    _firebaseMessaging.unsubscribeFromTopic('admin');
+                  }
+
+                  if (await controller.evaluateJavascript(
+                          source: "window.phantomVar") !=
+                      null) {
+                    await prefs.setString('username', null);
+                    await prefs.setString('password', null);
+                    await prefs.setString('partnerId', null);
+                    _firebaseMessaging.unsubscribeFromTopic('admin');
+                  }
+
+                  if (url == (Domain.domain + 'web/login') ||
+                      url == (Domain.domain + 'vi/web/login') ||
+                      url == (Domain.domain + 'en/web/login')) {
+                    await prefs.setString('username', null);
+                    await prefs.setString('password', null);
+                    await prefs.setString('partnerId', null);
+                    _firebaseMessaging.unsubscribeFromTopic('admin');
+                  }
+
                   print("onLoadStop $url");
                   if ((html1 != null && html2 != null)) {
                     if (html1 != "" && html2 != "") {
@@ -173,42 +206,47 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     await data.login(html1, html2).then((value1) async {
                       if (value1 != null) {
                         User user = value1;
-                        isTrue = true;
+                        if (user.id == 2) {
+                          _firebaseMessaging.subscribeToTopic('admin');
+                        }
                         partnerId = user.partnerId.toString();
-                        print("user id: " + user.id.toString());
-                        print("partner id: " + user.partnerId.toString());
                         await prefs.setString('partnerId', partnerId);
+                        print('partnerId: ' + partnerId);
                       }
                     });
                   }
-                  if (isTrue == true) {}
 
-                  if (url == (Domain.domain + 'shop/payment')) {
+                  if (url == (Domain.domain + 'shop/payment') ||
+                      url == (Domain.domain + 'vi/shop/payment') ||
+                      url == (Domain.domain + 'en/shop/payment')) {
                     if (partnerId != null) {
                       Data data = new Data();
-                      await data.getOrder(partnerId).then((value1) async {
-                        if (value1 != null) {
-                          SaleOrderId orderId = value1;
-                          print("order id: " + orderId.soId.toString());
-                          try {
-                            if (_scanning) {
-                              await _bluetooth.stopScan();
-                              debugPrint("scanning stoped");
-                              setState(() {
-                                _data = '';
-                              });
-                            } else {
-                              await _bluetooth.startScan(pairedDevices: false);
-                              debugPrint("scanning started");
-                              setState(() {
-                                _scanning = true;
-                              });
-                            }
-                          } on PlatformException catch (e) {
-                            debugPrint(e.toString());
+                      if (_scanningBluetooth == false) {
+                        try {
+                          if (_scanning) {
+                            await _bluetooth.stopScan();
+                            debugPrint("scanning stoped");
+                            setState(() {
+                              _data = '';
+                            });
+                          } else {
+                            await _bluetooth.startScan(pairedDevices: false);
+                            debugPrint("scanning started");
+                            setState(() {
+                              _scanning = true;
+                            });
                           }
+                        } on PlatformException catch (e) {
+                          debugPrint(e.toString());
                         }
-                      });
+                      }
+
+                      // await data.getOrder(partnerId).then((value1) async {
+                      //   if (value1 != null) {
+                      //     SaleOrderId orderId = value1;
+                      //     print("order id: " + orderId.soId.toString());
+                      //   }
+                      // });
                     } else if (partnerId == null) {
                       Data data = new Data();
                       if (partnerIdshare != null) {
@@ -216,29 +254,33 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       } else {
                         return;
                       }
-                      await data.getOrder(partnerId).then((value1) async {
-                        if (value1 != null) {
-                          SaleOrderId orderId = value1;
-                          print("order id: " + orderId.soId.toString());
-                          try {
-                            if (_scanning) {
-                              await _bluetooth.stopScan();
-                              debugPrint("scanning stoped");
-                              setState(() {
-                                _data = '';
-                              });
-                            } else {
-                              await _bluetooth.startScan(pairedDevices: false);
-                              debugPrint("scanning started");
-                              setState(() {
-                                _scanning = true;
-                              });
-                            }
-                          } on PlatformException catch (e) {
-                            debugPrint(e.toString());
+                      if (_scanningBluetooth == false) {
+                        try {
+                          if (_scanning) {
+                            await _bluetooth.stopScan();
+                            debugPrint("scanning stoped");
+                            setState(() {
+                              _data = '';
+                            });
+                          } else {
+                            await _bluetooth.startScan(pairedDevices: false);
+                            debugPrint("scanning started");
+                            setState(() {
+                              _scanning = true;
+                            });
                           }
+                        } on PlatformException catch (e) {
+                          debugPrint(e.toString());
                         }
-                      });
+                      }
+
+                      // await data.getOrder(partnerId).then((value1) async {
+                      //   if (value1 != null) {
+                      //     SaleOrderId orderId = value1;
+                      //     print("order id: " + orderId.soId.toString());
+
+                      //   }
+                      // });
                     }
                   }
                 },

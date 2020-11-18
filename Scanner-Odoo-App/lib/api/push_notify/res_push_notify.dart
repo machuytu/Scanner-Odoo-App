@@ -3,26 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:odooscanner/models/gobal.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:odooscanner/models/firebase_messing.dart';
 import 'package:odooscanner/res/string.dart';
 import 'package:overlay_support/overlay_support.dart';
-
-Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {
-  if (message.containsKey('data')) {
-    // Handle data message
-    final dynamic data = message['data'];
-  }
-
-  if (message.containsKey('notification')) {
-    // Handle notification message
-    final dynamic notification = message['notification'];
-  }
-
-  // Or do other work.
-}
 
 class RestDataSourcePushNotify {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -69,26 +55,37 @@ class RestDataSourcePushNotify {
     });
 
     _firebaseMessaging.configure(
-      // onBackgroundMessage: myBackgroundMessageHandler,
       onMessage: (Map<String, dynamic> message) async {
-        CloudMessing cloudMessaging = new CloudMessing();
-        cloudMessaging.soId = int.tryParse(message['data']['so_id']);
-        cloudMessaging.partnerName = message['data']['partner_name'];
-        cloudMessaging.soName = message['data']['so_name'];
-        showSimpleNotification(
-          Text(
-            '${message['notification']['title']}',
-            style: TextStyle(color: Colors.white),
+        Get.dialog(
+          AlertDialog(
+            title: Text("${message['notification']['title']}"),
+            content: Text("${message['notification']['body']}"),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Go to order"),
+                onPressed: () {
+                  Get.back();
+                  Glob().getServerUrl().loadUrl(
+                      url:
+                          'http://103.142.139.193:8069/web#id=${message['data']['so_id']}&action=291&model=sale.order&view_type=form&cids=1&menu_id=170');
+                },
+              ),
+              FlatButton(
+                child: Text("Close"),
+                onPressed: () {
+                  Get.back();
+                },
+              )
+            ],
           ),
-          duration: Duration(seconds: 10),
-          slideDismiss: true,
-          background: Colors.black,
+          barrierDismissible: false,
         );
-        Get.snackbar("${cloudMessaging.partnerName}", "${cloudMessaging.soId}");
       },
       onResume: (Map<String, dynamic> message) async {
         print('on resume $message');
-        // await Future.delayed(Duration(minutes: 1));
+        Glob().getServerUrl().loadUrl(
+            url:
+                'http://103.142.139.193:8069/web#id=${message['data']['so_id']}&action=291&model=sale.order&view_type=form&cids=1&menu_id=170');
         showSimpleNotification(
           Text(
             "this is a message from on resume notification",
@@ -98,10 +95,12 @@ class RestDataSourcePushNotify {
           slideDismiss: true,
           background: Colors.black.withOpacity(0.3),
         );
-        
       },
       onLaunch: (Map<String, dynamic> message) async {
         print('on launch $message');
+        Glob().getServerUrl().loadUrl(
+            url:
+                'http://103.142.139.193:8069/web#id=${message['data']['so_id']}&action=291&model=sale.order&view_type=form&cids=1&menu_id=170');
         // await Future.delayed(Duration(minutes: 1));
         showSimpleNotification(
           Text("this is a message from on launch notification"),
