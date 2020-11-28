@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:location_permissions/location_permissions.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:odooscanner/in_app_webiew_example.screen.dart';
 
@@ -164,10 +165,13 @@ class _MyAppState extends State<MyApp> {
     _requestPermissions();
     _configureDidReceiveLocalNotificationSubject();
     _configureSelectNotificationSubject();
+
     super.initState();
   }
 
-  void _requestPermissions() {
+  Future<void> _requestPermissions() async {
+    PermissionStatus permission =
+        await LocationPermissions().requestPermissions();
     flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
             IOSFlutterLocalNotificationsPlugin>()

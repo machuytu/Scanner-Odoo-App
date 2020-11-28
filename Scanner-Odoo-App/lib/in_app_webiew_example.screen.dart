@@ -26,7 +26,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   String url = "";
   double progress = 0;
   bool _scanning = false;
-  bool _scanningBluetooth = false;
+
   FlutterScanBluetooth _bluetooth = FlutterScanBluetooth();
   String username, password, partnerIdshare;
   final FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
@@ -47,33 +47,29 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
     // Bluetooth scanner
     _bluetooth.devices.listen((device) async {
-      if (device.address == '4C:1D:96:B9:59:19') {
+      if (device.address == 'DC:53:60:86:1E:A5') {
         print('Tim thay1');
         Data data = new Data();
-        if (_scanningBluetooth == false) {
-          await data.sendPartnerId(partnerId).then((value1) async {
-            if (value1 == true) {
-              print('gui thanh cong');
-              _scanningBluetooth = true;
-            } else {
-              print('gui that bai');
-            }
-          });
-        }
 
-        setState(() {
-          print('Tim thay');
-          _bluetooth.stopScan();
-          _scanning = false;
+        await data.sendPartnerId(partnerId).then((value1) async {
+          if (value1 == true) {
+            print('gui thanh cong');
+          } else {
+            print('gui that bai');
+          }
         });
+        print('Tim thay');
+        _scanning = true;
+        _bluetooth.stopScan();
+      } else {
+        _scanning = false;
       }
     });
     _bluetooth.scanStopped.listen((device) async {
-      if (_scanning != false) {
+      if (_scanning == false) {
         setState(() {
           _bluetooth.startScan(pairedDevices: false);
           debugPrint("chay lai");
-          _scanning = true;
         });
       }
     });
@@ -123,6 +119,52 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 onLoadStart:
                     (InAppWebViewController controller, String url) async {
                   print("onLoadStart $url");
+                  if (url == (Domain.domain + 'shop/payment') ||
+                      url == (Domain.domain + 'vi/shop/payment') ||
+                      url == (Domain.domain + 'en/shop/payment')) {
+                    if (partnerId != null) {
+                      try {
+                        await _bluetooth.startScan(pairedDevices: false);
+                        debugPrint("scanning started");
+                        setState(() {
+                          _scanning = true;
+                        });
+                      } on PlatformException catch (e) {
+                        debugPrint(e.toString());
+                      }
+                    }
+
+                    // await data.getOrder(partnerId).then((value1) async {
+                    //   if (value1 != null) {
+                    //     SaleOrderId orderId = value1;
+                    //     print("order id: " + orderId.soId.toString());
+                    //   }
+                    // });
+                  } else if (partnerId == null) {
+                    if (partnerIdshare != null) {
+                      partnerId = partnerIdshare;
+                    } else {
+                      return;
+                    }
+
+                    try {
+                      if (_scanning) {
+                        await _bluetooth.stopScan();
+                        debugPrint("scanning stoped");
+                        setState(() {
+                          _data = '';
+                        });
+                      } else {
+                        await _bluetooth.startScan(pairedDevices: false);
+                        debugPrint("scanning started");
+                        setState(() {
+                          _scanning = true;
+                        });
+                      }
+                    } on PlatformException catch (e) {
+                      debugPrint(e.toString());
+                    }
+                  }
                   setState(() {
                     this.url = url;
                   });
@@ -216,73 +258,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     });
                   }
 
-                  if (url == (Domain.domain + 'shop/payment') ||
-                      url == (Domain.domain + 'vi/shop/payment') ||
-                      url == (Domain.domain + 'en/shop/payment')) {
-                    if (partnerId != null) {
-                      Data data = new Data();
-                      if (_scanningBluetooth == false) {
-                        try {
-                          if (_scanning) {
-                            await _bluetooth.stopScan();
-                            debugPrint("scanning stoped");
-                            setState(() {
-                              _data = '';
-                            });
-                          } else {
-                            await _bluetooth.startScan(pairedDevices: false);
-                            debugPrint("scanning started");
-                            setState(() {
-                              _scanning = true;
-                            });
-                          }
-                        } on PlatformException catch (e) {
-                          debugPrint(e.toString());
-                        }
-                      }
+                  // await data.getOrder(partnerId).then((value1) async {
+                  //   if (value1 != null) {
+                  //     SaleOrderId orderId = value1;
+                  //     print("order id: " + orderId.soId.toString());
 
-                      // await data.getOrder(partnerId).then((value1) async {
-                      //   if (value1 != null) {
-                      //     SaleOrderId orderId = value1;
-                      //     print("order id: " + orderId.soId.toString());
-                      //   }
-                      // });
-                    } else if (partnerId == null) {
-                      Data data = new Data();
-                      if (partnerIdshare != null) {
-                        partnerId = partnerIdshare;
-                      } else {
-                        return;
-                      }
-                      if (_scanningBluetooth == false) {
-                        try {
-                          if (_scanning) {
-                            await _bluetooth.stopScan();
-                            debugPrint("scanning stoped");
-                            setState(() {
-                              _data = '';
-                            });
-                          } else {
-                            await _bluetooth.startScan(pairedDevices: false);
-                            debugPrint("scanning started");
-                            setState(() {
-                              _scanning = true;
-                            });
-                          }
-                        } on PlatformException catch (e) {
-                          debugPrint(e.toString());
-                        }
-                      }
-
-                      // await data.getOrder(partnerId).then((value1) async {
-                      //   if (value1 != null) {
-                      //     SaleOrderId orderId = value1;
-                      //     print("order id: " + orderId.soId.toString());
-
-                      //   }
-                      // });
-                    }
-                  }
+                  //   }
+                  // });
                 },
                 onProgressChanged:
                     (InAppWebViewController controller, int progress) {
