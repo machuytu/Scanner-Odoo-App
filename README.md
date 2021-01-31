@@ -12,7 +12,7 @@ A Flutter application run odoo website on mobile device
 
 Bluetooth adress: in_app_webiew_example.screen.dart
 
-- add to array listBle
+- device.address
 
 Domain adress: /res/domain.dart
 
