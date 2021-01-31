@@ -12,6 +12,7 @@ import 'package:overlay_support/overlay_support.dart';
 
 class RestDataSourcePushNotify {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
   static const BASE_URL = "https://fcm.googleapis.com/fcm/send";
   final String serverToken = StringName.serverToken;
   static const to = StringName.roomToken;
@@ -47,12 +48,13 @@ class RestDataSourcePushNotify {
     }
   }
 
-  void retrieveMessage() {
-    if (Platform.isIOS) iosPermission();
+  void retrieveMessage() async {
+    // if (Platform.isIOS) iosPermission();
+    iosPermission();
 
-    _firebaseMessaging.getToken().then((token) {
-      print('token: $token');
-    });
+    await _firebaseMessaging.setAutoInitEnabled(true);
+
+    print('token: ${await _firebaseMessaging.getToken()}');
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {

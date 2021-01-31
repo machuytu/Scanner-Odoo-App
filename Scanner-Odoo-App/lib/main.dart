@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:location_permissions/location_permissions.dart';
+import 'package:odooscanner/test_bluetooth.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:odooscanner/in_app_webiew_example.screen.dart';
 
@@ -90,6 +91,7 @@ Future main() async {
   // });
 
   runApp(MyApp(notificationAppLaunchDetails));
+  // runApp(MyAppTestbluetooth());
 }
 
 Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) async {

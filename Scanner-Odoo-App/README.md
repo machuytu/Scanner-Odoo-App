@@ -1,6 +1,6 @@
-# odooscanner
+# Smart Sale Flutter application
 
-A new Flutter application.
+A Flutter application run odoo website on mobile device
 
 ## Getting Started
 

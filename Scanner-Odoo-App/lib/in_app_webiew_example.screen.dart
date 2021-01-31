@@ -47,7 +47,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
     // Bluetooth scanner
     _bluetooth.devices.listen((device) async {
-      if (device.address == 'DC:53:60:86:1E:A5') {
+      if (device.address == '50:EB:71:DD:E8:47') {
         print('Tim thay1');
         Data data = new Data();
 
