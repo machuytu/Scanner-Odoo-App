@@ -10,11 +10,11 @@ A Flutter application run odoo website on mobile device
 
 ## Configuration
 
-Bluetooth adress: in_app_webiew_example.screen.dart
+**Bluetooth adress**: in_app_webiew_example.screen.dart
 
 - device.address
 
-Domain adress: /res/domain.dart
+**Domain adress**: /res/domain.dart
 
 - Nodejs for Firebase Cloud Messaging
 - Odoo for Website
